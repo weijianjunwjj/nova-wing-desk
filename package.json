@@ -9,6 +9,7 @@
   "scripts": {
     "dev:web": "npm run dev -w @nova-wing-desk/web",
     "dev:api": "npm run start:dev -w @nova-wing-desk/api",
-    "build": "npm run build -ws --if-present"
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run build -w @nova-wing-desk/api && node --test apps/api/test/*.test.mjs"
   }
 }
