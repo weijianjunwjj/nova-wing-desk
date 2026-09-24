@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: novawing
+      POSTGRES_PASSWORD: novawing
+      POSTGRES_DB: novawing_desk
+    ports:
+      - "5432:5432"
+    volumes:
+      - novawing-desk-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U novawing -d novawing_desk"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+volumes:
+  novawing-desk-postgres:
