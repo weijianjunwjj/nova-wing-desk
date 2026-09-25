@@ -2,15 +2,15 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: novawing
-      POSTGRES_PASSWORD: novawing
-      POSTGRES_DB: novawing_desk
+      POSTGRES_USER: ${POSTGRES_USER:-novawing}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-novawing}
+      POSTGRES_DB: ${POSTGRES_DB:-novawing_desk}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - novawing-desk-postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U novawing -d novawing_desk"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-novawing} -d $${POSTGRES_DB:-novawing_desk}"]
       interval: 2s
       timeout: 5s
       retries: 15
