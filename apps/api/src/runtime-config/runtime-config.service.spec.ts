@@ -29,4 +29,25 @@ describe('RuntimeConfigService', () => {
     expect(result.presets).toEqual({ default: { model: 'enabled-model', reasoningLevel: 'low' } });
     expect(result.presets.review).toBeUndefined();
   });
+
+  it('publishes the DeepSeek reviewer runtime alias without reasoning', async () => {
+    const reviewer = Object.assign(new ModelEntity(), {
+      id: '10000000-0000-4000-8000-000000000003',
+      provider: 'deepseek', modelId: 'sonnet', displayName: 'DeepSeek route alias: sonnet', enabled: true,
+      supportsReasoning: false, reasoningLevels: [], defaultReasoningLevel: null,
+    });
+    const presets = [Object.assign(new ModelPresetEntity(), {
+      key: 'review', modelId: reviewer.id, model: reviewer, enabled: true, reasoningLevel: null,
+    })];
+    const modelsService = { findEnabled: vi.fn(async () => [reviewer]) } as unknown as ModelsService;
+    const presetsService = { findEnabled: vi.fn(async () => presets) } as unknown as PresetsService;
+
+    const result = await new RuntimeConfigService(modelsService, presetsService).getConfig();
+
+    expect(result.models).toEqual([{
+      provider: 'deepseek', model: 'sonnet', displayName: 'DeepSeek route alias: sonnet',
+      supportsReasoning: false, reasoningLevels: [], defaultReasoningLevel: null,
+    }]);
+    expect(result.presets.review).toEqual({ model: 'sonnet', reasoningLevel: null });
+  });
 });
