@@ -15,20 +15,29 @@ profile，分别为 executor、retry、reviewer、escalation 指定模型 ID 和
 
 ## 本机启动
 
-要求 Node.js >=22.22.3、npm 和 PostgreSQL。可选用 `docker compose up -d db`
-启动本机数据库，示例账号只用于本机开发。
+要求 Node.js >=22.22.3、npm 和提供 `docker compose` 的 Docker 环境。标准本地链路在
+Windows 与 macOS 使用相同命令；完整约束见
+[跨平台开发规范](docs/engineering/cross-platform.md)。
 
-```bash
-npm install
-export DATABASE_URL='postgres://novawing:novawing-dev@127.0.0.1:5432/novawing_desk'
-npm run dev:api
-# 另开一个终端
-npm run dev:web
-```
+首次启动：
 
-访问 http://127.0.0.1:3000 。API 在 http://127.0.0.1:3001 ，启动时执行
-TypeORM migration。可用 `NOVAWING_DESK_API_URL` 指定 Next.js 服务端访问的 API 地址；
-浏览器只请求同源 `/api/model-routing`，不直接跨域访问 NestJS。
+1. 安装依赖：`npm install`。
+2. 将仓库根目录的 `.env.example` 复制为 `.env`。默认值与 Compose 的本机开发账号匹配；
+   `.env` 已被 Git 忽略，不要提交真实配置。如果 5432 已被占用，请同时修改
+   `POSTGRES_PORT` 和 `DATABASE_URL` 中的宿主端口。
+3. 启动 PostgreSQL：`docker compose up -d db`。
+4. 执行 migration：`npm run db:migrate`。
+5. 写入幂等的初始配置：`npm run db:seed`。
+6. 在一个终端启动 API：`npm run dev:api`。
+7. 在另一个终端启动 Web：`npm run dev:web`。
+
+以后启动通常只需确认 Docker 正在运行，然后执行 `docker compose up -d db`、
+`npm run dev:api` 和 `npm run dev:web`。API 会从仓库根目录 `.env` 加载
+`DATABASE_URL`，并在启动时补跑尚未执行的 TypeORM migration，不依赖终端之前导出的变量。
+
+访问 http://127.0.0.1:3000 。API 健康检查位于 http://127.0.0.1:3001/health 。
+可用 `NOVAWING_DESK_API_URL` 指定 Next.js 服务端访问的 API 地址；浏览器只请求同源
+`/api/model-routing`，不直接跨域访问 NestJS。
 
 ```bash
 npm run build
