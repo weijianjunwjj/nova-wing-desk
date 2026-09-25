@@ -1,13 +1,14 @@
 import type { ReactNode } from 'react';
+import './globals.css';
 
 export const metadata = {
   title: 'NovaWing Desk',
-  description: 'Post-run operations for NovaWing.',
+  description: 'NovaWing 本机后台配置中心',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <body>{children}</body>
     </html>
   );
