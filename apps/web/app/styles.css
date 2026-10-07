@@ -52,3 +52,45 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1
   main { padding: 24px 18px; overflow-x: auto; }
   .form-grid { grid-template-columns: 1fr; }
 }
+
+
+/* Career Eval: static evidence view for the Career Release pilot. */
+.metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 22px; }
+.metric-card { background: #fff; border: 1px solid #e1e5eb; border-radius: 9px; padding: 18px; display: grid; gap: 7px; }
+.metric-card span { color: #667085; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+.metric-card strong { font-size: 25px; line-height: 1.1; }
+.metric-card small { color: #667085; line-height: 1.35; }
+.eval-summary { padding: 24px; display: grid; grid-template-columns: minmax(260px, .8fr) minmax(320px, 1.2fr); gap: 30px; margin-bottom: 30px; }
+.eval-summary h2, .methodology-card h2, .section-heading h2 { margin-top: 6px; }
+.eyebrow { color: #2563eb; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.insight-list { display: grid; gap: 11px; }
+.insight-list p { padding-left: 16px; position: relative; line-height: 1.45; }
+.insight-list p::before { content: "•"; position: absolute; left: 0; color: #2563eb; }
+.eval-section { margin-top: 30px; }
+.section-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 14px; }
+.section-heading p { max-width: 520px; text-align: right; }
+.task-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.task-card { padding: 20px; }
+.task-card h3 { margin: 14px 0 8px; font-size: 17px; }
+.task-card p { line-height: 1.45; }
+.task-card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.difficulty { display: inline-block; padding: 4px 8px; border-radius: 999px; background: #eef4ff; color: #3448a5; font-size: 11px; font-weight: 700; letter-spacing: .06em; }
+.table-scroll { overflow-x: auto; }
+.table-scroll table { min-width: 980px; }
+.status-badge { display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.status-badge.accept { background: #eaf8ef; color: #18733a; }
+.status-badge.revision { background: #fff2e8; color: #9a4b00; }
+.status-badge.note { background: #f1f2f4; color: #475467; }
+.cell-note { display: block; color: #8a94a4; margin-top: 5px; max-width: 320px; line-height: 1.3; }
+.muted-row { opacity: .7; }
+.methodology-card { margin-top: 30px; padding: 24px; }
+.methodology-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+.methodology-grid strong { display: block; margin-bottom: 6px; }
+.methodology-grid p { line-height: 1.45; }
+.source-note { margin-top: 22px; padding-top: 16px; border-top: 1px solid #e8ebef; }
+
+@media (max-width: 1100px) {
+  .metric-grid, .methodology-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .task-grid { grid-template-columns: 1fr; }
+  .eval-summary { grid-template-columns: 1fr; }
+}

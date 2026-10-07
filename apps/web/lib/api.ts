@@ -42,7 +42,7 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   if (!response.ok) {
     const body = (await response.json().catch(() => null)) as { message?: string | string[] } | null;
     const message = Array.isArray(body?.message) ? body.message.join(', ') : body?.message;
-    throw new Error(message ?? `Request failed (${response.status})`);
+    throw new Error(message ?? `请求失败（HTTP ${response.status}）`);
   }
   return response.json() as Promise<T>;
 }

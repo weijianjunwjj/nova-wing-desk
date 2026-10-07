@@ -4,6 +4,8 @@ NovaWing Desk is NovaWing's independent configuration and management plane. Nova
 
 Phase 1 implements the **Model Configuration Registry**:
 
+Career Release also adds a static **Career Eval** evidence view at `/eval`. It presents the frozen Low / Medium / High real-task replay pilot, with TTAR, first-pass review outcome, harness/model route, commit evidence, and the current routing conclusion. The source-of-truth dataset remains in the NovaWing runtime repository at `benchmark/career-eval-v1.json`; Desk intentionally renders a frozen snapshot and does not ingest runtime events in this phase.
+
 - manage available models and their reasoning capabilities;
 - map work presets such as `implementation` and `review` to a model policy;
 - persist configuration in PostgreSQL;
