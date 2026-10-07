@@ -18,6 +18,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Link href="/models">Models</Link>
             <Link href="/presets">Presets</Link>
           </nav>
+          <p className="section-label">Evidence</p>
+          <nav>
+            <Link href="/eval">Career Eval</Link>
+          </nav>
         </aside>
         <main>{children}</main>
       </body>
