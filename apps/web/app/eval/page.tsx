@@ -1,16 +1,35 @@
 import { careerEval, type EvalReviewStatus } from '../../lib/career-eval';
 
 function formatDuration(seconds: number | null) {
-  if (seconds === null) return 'Not captured';
+  if (seconds === null) return '未记录';
   const minutes = Math.floor(seconds / 60);
   const rest = seconds % 60;
-  return minutes === 0 ? `${rest}s` : `${minutes}m ${String(rest).padStart(2, '0')}s`;
+  return minutes === 0 ? `${rest} 秒` : `${minutes} 分 ${String(rest).padStart(2, '0')} 秒`;
 }
 
 function statusClass(status: EvalReviewStatus) {
   if (status === 'ACCEPT') return 'status-badge accept';
   if (status === 'REVISION_REQUIRED') return 'status-badge revision';
   return 'status-badge note';
+}
+
+function statusLabel(status: EvalReviewStatus) {
+  if (status === 'ACCEPT') return '通过';
+  if (status === 'REVISION_REQUIRED') return '需要修订';
+  return '通过（规格说明）';
+}
+
+function effortLabel(effort: string) {
+  if (effort === 'High') return '高';
+  if (effort === 'Max') return '最大';
+  return effort;
+}
+
+function difficultyLabel(difficulty: string) {
+  if (difficulty === 'LOW') return '低';
+  if (difficulty === 'MEDIUM') return '中';
+  if (difficulty === 'HIGH') return '高';
+  return difficulty;
 }
 
 export default function EvalPage() {
@@ -26,39 +45,39 @@ export default function EvalPage() {
   return <>
     <div className="page-header">
       <div>
-        <h1>Career Eval</h1>
-        <p>Real-repository task replay focused on time to an independently reviewed accepted result.</p>
+        <h1>职业评测</h1>
+        <p>基于真实仓库任务重放，关注从提交任务到独立 Review 通过的实际耗时。</p>
       </div>
-      <span className="badge">Frozen {careerEval.frozenAt}</span>
+      <span className="badge">冻结于 {careerEval.frozenAt}</span>
     </div>
 
     <div className="metric-grid">
       <div className="metric-card">
-        <span>Primary metric</span>
+        <span>核心指标</span>
         <strong>TTAR</strong>
-        <small>Time to Accepted Result</small>
+        <small>Time to Accepted Result / 被验收结果耗时</small>
       </div>
       <div className="metric-card">
-        <span>Fresh H1 first-pass</span>
+        <span>H1 首轮通过</span>
         <strong>{acceptedH1.length}/{freshH1.length}</strong>
-        <small>ACCEPT without a corrective implementation round</small>
+        <small>无需纠偏实现轮次即可直接 ACCEPT</small>
       </div>
       <div className="metric-card">
-        <span>Fastest accepted H1</span>
+        <span>最快被验收 H1</span>
         <strong>{formatDuration(fastestAcceptedH1?.durationSeconds ?? null)}</strong>
-        <small>{fastestAcceptedH1 ? `${fastestAcceptedH1.harness} · ${fastestAcceptedH1.model}` : 'No accepted run'}</small>
+        <small>{fastestAcceptedH1 ? `${fastestAcceptedH1.harness} · ${fastestAcceptedH1.model}` : '暂无通过运行'}</small>
       </div>
       <div className="metric-card">
-        <span>Fastest H1 first result</span>
+        <span>最快 H1 首个结果</span>
         <strong>{formatDuration(fastestH1?.durationSeconds ?? null)}</strong>
-        <small>{fastestH1 ? `${fastestH1.harness} · ${fastestH1.reviewStatus}` : 'No timed run'}</small>
+        <small>{fastestH1 ? `${fastestH1.harness} · ${statusLabel(fastestH1.reviewStatus)}` : '暂无计时运行'}</small>
       </div>
     </div>
 
     <section className="card eval-summary">
       <div>
-        <span className="eyebrow">Engineering conclusion</span>
-        <h2>First-result speed and accepted-result speed are different metrics.</h2>
+        <span className="eyebrow">工程结论</span>
+        <h2>“首个结果快”和“最快拿到可验收结果”不是同一个指标。</h2>
       </div>
       <div className="insight-list">
         {careerEval.conclusion.map(item => <p key={item}>{item}</p>)}
@@ -67,13 +86,13 @@ export default function EvalPage() {
 
     <section className="eval-section">
       <div className="section-heading">
-        <div><span className="eyebrow">Task set</span><h2>Three real-history replay levels</h2></div>
-        <p>Hidden historical fixes are review references, never input to the runner.</p>
+        <div><span className="eyebrow">任务集</span><h2>三档真实历史任务重放</h2></div>
+        <p>历史实现只作为 Review 的隐藏参考，不会提供给执行 Harness。</p>
       </div>
       <div className="task-grid">
         {careerEval.tasks.map(task => <article className="card task-card" key={task.id}>
           <div className="task-card-top">
-            <span className="difficulty">{task.difficulty}</span>
+            <span className="difficulty">{difficultyLabel(task.difficulty)}</span>
             <code>{task.id}</code>
           </div>
           <h3>{task.name}</h3>
@@ -84,22 +103,22 @@ export default function EvalPage() {
 
     <section className="eval-section">
       <div className="section-heading">
-        <div><span className="eyebrow">Run matrix</span><h2>What each harness actually delivered</h2></div>
-        <p>Non-comparable runs remain visible but are excluded from strict routing conclusions.</p>
+        <div><span className="eyebrow">运行矩阵</span><h2>各 Harness 实际交付结果</h2></div>
+        <p>不可严格比较的运行仍保留展示，但不会用于严格路由结论。</p>
       </div>
       <div className="card table-scroll">
         <table>
           <thead><tr>
-            <th>Task</th><th>Harness</th><th>Model</th><th>Effort</th><th>Duration</th><th>Review</th><th>Commit</th>
+            <th>任务</th><th>Harness</th><th>模型</th><th>推理档位</th><th>耗时</th><th>Review</th><th>Commit / 说明</th>
           </tr></thead>
           <tbody>
             {careerEval.runs.map(run => <tr key={run.id} className={run.comparable ? '' : 'muted-row'}>
-              <td><strong>{run.taskId}</strong>{!run.comparable && <small className="cell-note">Non-comparable</small>}</td>
+              <td><strong>{run.taskId}</strong>{!run.comparable && <small className="cell-note">不可严格比较</small>}</td>
               <td>{run.harness}</td>
               <td>{run.model}</td>
-              <td>{run.effort}</td>
+              <td>{effortLabel(run.effort)}</td>
               <td>{formatDuration(run.durationSeconds)}<small className="cell-note">{run.durationBasis}</small></td>
-              <td><span className={statusClass(run.reviewStatus)}>{run.reviewStatus.replaceAll('_', ' ')}</span></td>
+              <td><span className={statusClass(run.reviewStatus)}>{statusLabel(run.reviewStatus)}</span></td>
               <td><code>{run.commitSha.slice(0, 8)}</code>{run.note && <small className="cell-note">{run.note}</small>}</td>
             </tr>)}
           </tbody>
@@ -108,15 +127,15 @@ export default function EvalPage() {
     </section>
 
     <section className="card methodology-card">
-      <span className="eyebrow">Methodology</span>
-      <h2>Evidence before leaderboard claims</h2>
+      <span className="eyebrow">方法</span>
+      <h2>先看证据，再谈排行榜</h2>
       <div className="methodology-grid">
-        <div><strong>Fresh baseline</strong><p>Each comparable run starts from the same task-specific Git commit.</p></div>
-        <div><strong>Hidden reference</strong><p>Historical implementations are withheld until review.</p></div>
-        <div><strong>Acceptance review</strong><p>Passing tests are necessary, but missing safety invariants still produce REVISION REQUIRED.</p></div>
-        <div><strong>Small sample</strong><p>The pilot informs routing decisions; it does not claim universal model superiority.</p></div>
+        <div><strong>Fresh baseline</strong><p>每个可比较运行都从同一个任务专属 Git baseline 开始。</p></div>
+        <div><strong>隐藏参考</strong><p>历史实现直到 Review 阶段才可见，执行时完全隐藏。</p></div>
+        <div><strong>独立验收</strong><p>测试通过只是必要条件；缺失安全不变量仍会判定为“需要修订”。</p></div>
+        <div><strong>小样本</strong><p>该 pilot 用于辅助路由决策，不宣称某模型具有普遍优势。</p></div>
       </div>
-      <p className="source-note">Source snapshot: <code>{careerEval.source}</code></p>
+      <p className="source-note">数据快照：<code>{careerEval.source}</code></p>
     </section>
   </>;
 }
