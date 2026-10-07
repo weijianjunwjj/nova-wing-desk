@@ -4,7 +4,9 @@ function formatDuration(seconds: number | null) {
   if (seconds === null) return '未记录';
   const minutes = Math.floor(seconds / 60);
   const rest = seconds % 60;
-  return minutes === 0 ? `${rest} 秒` : `${minutes} 分 ${String(rest).padStart(2, '0')} 秒`;
+  return minutes === 0
+    ? String(rest) + ' 秒'
+    : String(minutes) + ' 分 ' + String(rest).padStart(2, '0') + ' 秒';
 }
 
 function statusClass(status: EvalReviewStatus) {
@@ -45,8 +47,8 @@ export default function EvalPage() {
   return <>
     <div className="page-header">
       <div>
-        <h1>职业评测</h1>
-        <p>基于真实仓库任务重放，关注从提交任务到独立 Review 通过的实际耗时。</p>
+        <h1>NovaWing 工程评测</h1>
+        <p>真实仓库任务重放：关注从任务提交到独立 Review 通过的实际耗时与证据质量。</p>
       </div>
       <span className="badge">冻结于 {careerEval.frozenAt}</span>
     </div>
@@ -60,17 +62,17 @@ export default function EvalPage() {
       <div className="metric-card">
         <span>H1 首轮通过</span>
         <strong>{acceptedH1.length}/{freshH1.length}</strong>
-        <small>无需纠偏实现轮次即可直接 ACCEPT</small>
+        <small>无需纠偏实现轮次即可直接通过</small>
       </div>
       <div className="metric-card">
         <span>最快被验收 H1</span>
         <strong>{formatDuration(fastestAcceptedH1?.durationSeconds ?? null)}</strong>
-        <small>{fastestAcceptedH1 ? `${fastestAcceptedH1.harness} · ${fastestAcceptedH1.model}` : '暂无通过运行'}</small>
+        <small>{fastestAcceptedH1 ? fastestAcceptedH1.harness + ' · ' + fastestAcceptedH1.model : '暂无通过运行'}</small>
       </div>
       <div className="metric-card">
         <span>最快 H1 首个结果</span>
         <strong>{formatDuration(fastestH1?.durationSeconds ?? null)}</strong>
-        <small>{fastestH1 ? `${fastestH1.harness} · ${statusLabel(fastestH1.reviewStatus)}` : '暂无计时运行'}</small>
+        <small>{fastestH1 ? fastestH1.harness + ' · ' + statusLabel(fastestH1.reviewStatus) : '暂无计时运行'}</small>
       </div>
     </div>
 

@@ -1,19 +1,16 @@
 {
   "name": "nova-wing-desk",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "engines": {
     "node": ">=22.22.3"
   },
-  "workspaces": ["apps/*"],
+  "workspaces": ["apps/web"],
   "scripts": {
+    "dev": "npm run dev -w @nova-wing-desk/web",
     "dev:web": "npm run dev -w @nova-wing-desk/web",
-    "dev:api": "npm run start:dev -w @nova-wing-desk/api",
-    "db:migrate": "npm run db:migrate -w @nova-wing-desk/api",
-    "db:seed": "npm run db:seed -w @nova-wing-desk/api",
-    "build": "npm run build --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present",
-    "check": "npm run typecheck && npm run test && npm run build"
+    "build": "npm run build -w @nova-wing-desk/web",
+    "typecheck": "npm run typecheck -w @nova-wing-desk/web",
+    "check": "npm run typecheck && npm run build"
   }
 }
