@@ -3,8 +3,8 @@ import Link from 'next/link';
 import './styles.css';
 
 export const metadata = {
-  title: 'NovaWing 控制台',
-  description: 'NovaWing 的配置、评测与管理控制台。',
+  title: 'NovaWing Desk',
+  description: 'NovaWing 工程评测与证据控制台。',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -12,15 +12,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="zh-CN">
       <body>
         <aside>
-          <Link className="brand" href="/models">NovaWing 控制台</Link>
-          <p className="section-label">配置</p>
-          <nav>
-            <Link href="/models">模型</Link>
-            <Link href="/presets">任务预设</Link>
-          </nav>
+          <Link className="brand" href="/eval">NovaWing Desk</Link>
+          <p className="brand-subtitle">Evaluation & Evidence</p>
           <p className="section-label">工程证据</p>
           <nav>
-            <Link href="/eval">职业评测</Link>
+            <Link href="/eval">工程评测</Link>
           </nav>
         </aside>
         <main>{children}</main>

@@ -1,20 +1,16 @@
 # Agent instructions
 
-Before changing this repository, read and follow
-[`docs/engineering/cross-platform.md`](docs/engineering/cross-platform.md). It is the
-canonical source for local-development and cross-platform rules.
+Before changing this repository, read and follow docs/engineering/cross-platform.md.
 
-The following are permanent project invariants for Codex and every other coding agent:
+NovaWing Desk is an Evaluation & Evidence Console, not a generic admin platform.
 
-- Preserve Windows and macOS support in all committed workflows.
-- Do not make the standard path depend on Bash-only or PowerShell-only behavior, WSL,
-  fixed drive letters, fixed Unix paths, or hand-written OS path separators.
-- Use Node.js/npm, a repository-root `.env`, and Docker Compose as the default local
-  development baseline.
-- Keep real `.env` files untracked; commit only safe templates such as `.env.example`.
-- Treat Windows real-host and macOS real-host cold starts as the formal acceptance rule.
-- Keep detailed guidance in the canonical document instead of duplicating it here.
+Permanent project invariants:
 
-When instructions conflict, follow the user's latest explicit request, then repository
-source/tests and the canonical cross-platform document. Make the smallest scoped change
-that satisfies the task, and do not overwrite unrelated working-tree changes.
+- Preserve Windows and macOS support in committed workflows.
+- Keep the standard path on Node.js/npm; do not require Bash-only, PowerShell-only, WSL, fixed drive letters, fixed Unix paths, or hand-written OS path separators.
+- Keep /eval usable without an API, database, Docker, secrets, or local environment file.
+- Treat the frozen Career Eval dataset as evidence: do not silently rewrite timings, review outcomes, commit SHAs, comparability notes, or methodology to make results look better.
+- Do not reintroduce Model Registry, Presets, API, database, or realtime ingestion without a real consumer and an explicit contract.
+- Prefer the smallest scoped change that increases explainability, verifiability, or presentation value. Do not overwrite unrelated working-tree changes.
+
+When instructions conflict, follow the user's latest explicit request, then repository source and verification.

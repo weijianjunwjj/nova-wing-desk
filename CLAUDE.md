@@ -1,18 +1,14 @@
 # Claude Code instructions
 
-At the start of every Claude Code session in this repository, read and follow
-[`docs/engineering/cross-platform.md`](docs/engineering/cross-platform.md). That document
-is the single detailed source of truth for cross-platform development.
+Read and follow docs/engineering/cross-platform.md before changing this repository.
 
-Permanent session invariants:
+NovaWing Desk is intentionally a small Evaluation & Evidence Console.
 
-- All standard development paths must work on Windows and macOS.
-- Do not introduce Bash-only or PowerShell-only requirements, WSL dependencies, fixed
-  drive letters, fixed Unix paths, or hand-written OS path separators.
-- Keep Node.js/npm, repository-root `.env`, and Docker Compose as the default baseline.
-- Never commit a real `.env`; maintain a safe `.env.example` for required configuration.
-- Require Windows real-host plus macOS real-host cold-start acceptance for setup changes,
-  and report any host that has not actually been verified.
+Session invariants:
 
-Do not duplicate the detailed rules here. Update the canonical document when the shared
-cross-platform policy changes, then keep this file as a short mandatory entry point.
+- Keep /eval static and locally runnable with Node.js/npm only.
+- Preserve Windows and macOS compatibility.
+- Do not introduce Bash-only, PowerShell-only, WSL, Docker, database, API, secret, or fixed-path requirements into the standard development path.
+- Career Eval data is engineering evidence. Preserve provenance, timing basis, review status, comparability caveats, and commit identity.
+- Do not rebuild the removed Model Registry / Presets backend unless the user explicitly establishes a real Runtime consumer or ingestion contract.
+- Make the smallest change that improves the evidence product, and preserve unrelated local edits.

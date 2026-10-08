@@ -1,66 +1,90 @@
 # NovaWing Desk
 
-NovaWing Desk is NovaWing's independent configuration and management plane. NovaWing Runtime executes work; Desk owns durable configuration and exposes a stable API that Runtime can consume.
+NovaWing Desk 是 NovaWing 的 Evaluation & Evidence Console（工程评测与证据控制台）。
 
-Phase 1 implements the **Model Configuration Registry**:
+当前版本只做一件事：把真实 AI 工程任务的执行结果、独立 Review 结论和可复核证据整理成清晰的展示面，用于工程决策与 Career Release。
 
-Career Release also adds a static **Career Eval** evidence view at `/eval`. It presents the frozen Low / Medium / High real-task replay pilot, with TTAR, first-pass review outcome, harness/model route, commit evidence, and the current routing conclusion. The source-of-truth dataset remains in the NovaWing runtime repository at `benchmark/career-eval-v1.json`; Desk intentionally renders a frozen snapshot and does not ingest runtime events in this phase.
+## 当前能力
 
-- manage available models and their reasoning capabilities;
-- map work presets such as `implementation` and `review` to a model policy;
-- persist configuration in PostgreSQL;
-- publish only enabled, valid configuration through `GET /api/v1/runtime-config`.
+- TTAR（Time to Accepted Result）：从任务提交到独立 Review 通过的实际耗时。
+- First-pass Acceptance：第一次实现是否无需纠偏即可通过。
+- Low / Medium / High 真实任务重放：基于 NovaWing 历史任务的 fresh-baseline replay。
+- Harness / Model 对照：记录执行 Harness、模型路由、推理档位、耗时、Review 结果与 commit SHA。
+- 工程结论：强调 accepted-result latency，而不是只比较首个结果速度或公开 benchmark。
 
-## Architecture
+路由：
 
-- Web: Next.js + React + TypeScript (`apps/web`)
-- API: NestJS + TypeScript + validation (`apps/api`)
-- Database: PostgreSQL + TypeORM migrations
+    /      -> /eval
+    /eval  -> 工程评测
 
-Desk and NovaWing Runtime remain separate repositories. Runtime integration is intentionally not part of this phase.
+## 架构
 
-## Local development
+Desk 现在是一个纯前端 Next.js 应用：
 
-Requires Node.js 22.22.3 or newer, npm, and a Docker environment that provides `docker compose`. Windows and macOS use the same standard commands; see the [cross-platform development standard](docs/engineering/cross-platform.md) for the permanent portability rules.
+    NovaWing real task replay
+            ↓
+    frozen evaluation dataset
+            ↓
+    NovaWing Desk /eval
+            ↓
+    TTAR / First-pass / Review / Commit evidence
 
-For the first start:
+技术栈：Next.js 16、React 19、TypeScript 6。
 
-1. Install dependencies with `npm install`.
-2. Copy the repository-root `.env.example` to `.env`. The real `.env` is ignored by Git and must not be committed. If port 5432 is already in use, change both `POSTGRES_PORT` and the host port in `DATABASE_URL`.
-3. Start PostgreSQL with `docker compose up -d postgres`.
-4. Apply migrations with `npm run db:migrate`.
-5. Ensure the editable Phase 1 starter data exists with `npm run db:seed`.
-6. Start the API with `npm run dev:api`.
-7. In another terminal, start the web app with `npm run dev:web`.
+运行时评测数据的 source of truth 位于 NovaWing 仓库的 benchmark/career-eval-v1.json。Desk 当前保存一份冻结展示快照，不连接 Runtime，也不做实时事件采集。
 
-The API and database commands load `DATABASE_URL` from the repository-root `.env`; they do not depend on values exported by a previous shell session. Existing process environment values may override `.env` for CI or intentional one-off operation.
+## 为什么删除 Model Registry / Presets / API / PostgreSQL
 
-The web app is available at <http://127.0.0.1:3000> and the API at <http://127.0.0.1:3001/api/v1>.
+早期 Desk 被设计成配置管理平面，包含模型 CRUD、任务预设、NestJS API、TypeORM、PostgreSQL、migration 与 seed。
 
-Database migrations are also applied automatically when the API starts. Both `db:migrate` and `db:seed` are safe to repeat. PostgreSQL data is stored in the `novawing-desk-postgres` volume and survives service restarts.
+这些能力在当前阶段没有真实 Runtime consumer，也不直接提高 Career Release 的工程证据价值。继续保留只会带来：
 
-## API
+- 本地启动依赖 API + 数据库；
+- 页面容易出现无意义的 Failed to fetch；
+- 配置、迁移、seed、Compose 和后端依赖的维护成本；
+- 对 Desk 当前职责的干扰。
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `GET` | `/api/v1/health` | Health check |
-| `GET` | `/api/v1/models` | List configured models |
-| `POST` | `/api/v1/models` | Create a model |
-| `PATCH` | `/api/v1/models/:id` | Edit, enable, or disable a model |
-| `GET` | `/api/v1/presets` | List presets |
-| `PATCH` | `/api/v1/presets/:key` | Change a preset policy |
-| `GET` | `/api/v1/runtime-config` | Stable Runtime-facing effective configuration |
+因此本轮将它们完整移除，而不是隐藏入口。
 
-The Runtime contract uses public DTOs rather than database entities. Its top-level `version` is the contract version, not a change counter.
+重新引入后端的条件：只有当 NovaWing Runtime 出现真实、持续的配置消费需求或评测事件 ingestion 需求时，再基于明确 contract 恢复服务端能力。
 
-## Verification
+该决策见 docs/adr/0001-evidence-console-scope.md。
 
-```bash
-npm run check
-```
+## 本地开发
 
-This runs TypeScript checks, unit tests, and production builds for all workspaces.
+要求 Node.js 22.22.3 或更高版本。
 
-## Current scope
+    npm install
+    npm run check
+    npm run dev:web
 
-This phase deliberately excludes users and RBAC, runtime event ingestion, dashboards, Redis, queues, realtime transport, cloud deployment, and changes to the NovaWing Runtime repository.
+浏览器打开 http://127.0.0.1:3000/eval。
+
+不需要 PostgreSQL、Docker Compose、.env 或 API 服务。
+
+## 验证
+
+    npm run check
+
+当前 check 包含：
+
+- Next.js route type generation + TypeScript typecheck
+- production build
+
+跨平台约束见 docs/engineering/cross-platform.md。
+
+## 当前边界
+
+当前明确不做：
+
+- 模型配置 CRUD
+- 任务预设 CRUD
+- PostgreSQL / TypeORM
+- NestJS API
+- Runtime 配置下发
+- Runtime 实时事件 ingestion
+- 用户 / RBAC
+- 队列 / Redis / realtime
+- 云部署
+
+新增能力必须直接提高可解释、可验证、可展示的工程证据价值。
